@@ -80,7 +80,7 @@ public class FileTransferClientHandler extends ChannelInboundHandlerAdapter {
 			System.out.println(response);
 			if(response.isEnd()){
 				randomAccessFile.close();
-				//ctx.close();
+				ctx.close();
 			}else{
 				start = response.getStart();
 				if (start != -1) {
