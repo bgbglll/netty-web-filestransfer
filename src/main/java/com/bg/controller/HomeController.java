@@ -1,5 +1,6 @@
 package com.bg.controller;
 
+import com.alibaba.fastjson.JSONObject;
 import com.bg.model.client.RequestFile;
 import com.bg.service.client.FileTransferClient;
 import com.bg.util.MD5FileUtil;
@@ -29,7 +30,7 @@ public class HomeController {
 
     @RequestMapping(path = {"/transferFile/"}, method = {RequestMethod.POST})
     @ResponseBody
-    public String transferFile(@RequestParam("file") MultipartFile fileTmp) {
+    public String transferFile(@RequestParam("qqfile") MultipartFile fileTmp) {
         try {
             int port = 10012;
         /*if (args != null && args.length > 0) {
@@ -41,8 +42,8 @@ public class HomeController {
 		}*/
             RequestFile echo = new RequestFile();
             //System.out.println(fileTmp.getName());
-            //System.out.println(fileTmp.getOriginalFilename());
-            File file = new File("E:/"+ fileTmp.getOriginalFilename());  //  "D://files/xxoo"+args[0]+".amr"
+            System.out.println(fileTmp.getOriginalFilename());
+            File file = new File("D:/deaProjects/netty-web-filestransfer/tmp/"+ fileTmp.getOriginalFilename());  //  "D://files/xxoo"+args[0]+".amr"
             fileTmp.transferTo(file);
 
 
@@ -55,11 +56,18 @@ public class HomeController {
             echo.setStarPos(0);// 文件开始位置
             //System.out.println(echo);
             new FileTransferClient().connect(port, "127.0.0.1", echo);
-            return "home";
+            JSONObject json = new JSONObject();
+            json.put("success", "ok");
+            return json.toJSONString();
         } catch (Exception e) {
             logger.error("发送文件失败" + e.getMessage());
             return "发送文件失败";
         }
 
+    }
+
+    @RequestMapping(path = {"/upload"}, method = {RequestMethod.GET, RequestMethod.POST})
+    public String upload() {
+        return "fileUpload";
     }
 }
