@@ -7,6 +7,7 @@ import com.bg.util.MD5FileUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -14,6 +15,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Administrator on 2016/7/29.
@@ -30,7 +33,7 @@ public class HomeController {
 
     @RequestMapping(path = {"/transferFile/"}, method = {RequestMethod.POST})
     @ResponseBody
-    public String transferFile(@RequestParam("qqfile") MultipartFile fileTmp) {
+    public String transferFile(@RequestParam("qqfile") List<MultipartFile> fileTmp) {
         try {
             int port = 10012;
         /*if (args != null && args.length > 0) {
@@ -40,22 +43,24 @@ public class HomeController {
 				e.printStackTrace();
 			}
 		}*/
-            RequestFile echo = new RequestFile();
-            //System.out.println(fileTmp.getName());
-            System.out.println(fileTmp.getOriginalFilename());
-            File file = new File("D:/deaProjects/netty-web-filestransfer/tmp/"+ fileTmp.getOriginalFilename());  //  "D://files/xxoo"+args[0]+".amr"
-            fileTmp.transferTo(file);
 
+            for(MultipartFile fTmp : fileTmp) {
+                RequestFile echo = new RequestFile();
+                //System.out.println(fileTmp.getName());
+                System.out.println(fTmp.getOriginalFilename());
+                File file = new File("D:/deaProjects/netty-web-filestransfer/tmp/"+ fTmp.getOriginalFilename());  //  "D://files/xxoo"+args[0]+".amr"
+                fTmp.transferTo(file);
 
+                String fileName = file.getName();// 文件名
+                echo.setFile(file);
+                echo.setFile_md5(MD5FileUtil.getFileMD5String(file));
+                echo.setFile_name(fileName);
+                echo.setFile_type(FileTransferClient.getSuffix(fileName));
+                echo.setStarPos(0);// 文件开始位置
+                //System.out.println(echo);
+                new FileTransferClient().connect(port, "127.0.0.1", echo);
+            }
 
-            String fileName = file.getName();// 文件名
-            echo.setFile(file);
-            echo.setFile_md5(MD5FileUtil.getFileMD5String(file));
-            echo.setFile_name(fileName);
-            echo.setFile_type(FileTransferClient.getSuffix(fileName));
-            echo.setStarPos(0);// 文件开始位置
-            //System.out.println(echo);
-            new FileTransferClient().connect(port, "127.0.0.1", echo);
             JSONObject json = new JSONObject();
             json.put("success", "ok");
             return json.toJSONString();
@@ -68,6 +73,11 @@ public class HomeController {
 
     @RequestMapping(path = {"/upload"}, method = {RequestMethod.GET, RequestMethod.POST})
     public String upload() {
+        return "fileUpload";
+    }
+
+    @RequestMapping(path = {"/test"}, method = {RequestMethod.GET, RequestMethod.POST})
+    public String test() {
         return "fileUpload";
     }
 }

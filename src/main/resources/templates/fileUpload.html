@@ -106,7 +106,8 @@
 <!-- Fine Uploader DOM Element
 ====================================================================== -->
 <div id="fine-uploader-manual-trigger"></div>
-
+test:   $!{test}
+success: $!success
 <!-- Your code to create an instance of Fine Uploader and bind to the DOM/template
 ====================================================================== -->
 <script>
@@ -120,6 +121,28 @@
             placeholders: {
                 waitingPath: '/placeholders/waiting-generic.png',
                 notAvailablePath: '/placeholders/not_available-generic.png'
+            }
+        },
+        callbacks: {
+            onComplete: function (id,name,responseJSON) {
+                if(responseJSON.success) {
+                    alert(responseJSON.success);
+                    alert(name);
+                    $.ajax({
+                        type: "POST",
+                        url: "/test",
+                        data: {msgId: id},
+                        dataType: "json",
+                        async: false,
+                        ache: false,
+                        success: function (data) {
+
+
+                            alert(name);
+                            //$("#msg-item-4009123").append(data);
+                        }
+                    });
+                }
             }
         },
         autoUpload: false,
