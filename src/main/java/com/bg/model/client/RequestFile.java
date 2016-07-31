@@ -15,7 +15,7 @@ public class RequestFile implements Serializable {
 	private String file_name;// 文件名
 	private long starPos;// 开始位置
 	private byte[] bytes;// 文件字节数组
-	private int endPos;// 结尾位置
+	private long endPos;// 结尾位置
 	private String file_md5; //文件的MD5值
 	private String file_type;  //文件类型
 	private long file_size; //文件总长度
@@ -28,11 +28,11 @@ public class RequestFile implements Serializable {
 		this.starPos = starPos;
 	}
 
-	public int getEndPos() {
+	public long getEndPos() {
 		return endPos;
 	}
 
-	public void setEndPos(int endPos) {
+	public void setEndPos(long endPos) {
 		this.endPos = endPos;
 	}
 

@@ -41,7 +41,7 @@ public class ResponseFile implements Serializable {
 		return start;
 	}
 
-	public void setStart(int start) {
+	public void setStart(long start) {
 		this.start = start;
 	}
 
@@ -86,6 +86,8 @@ public class ResponseFile implements Serializable {
 		sb.append(start);
 		sb.append("\t\tfile_url:");
 		sb.append(file_url);
+		sb.append("\t\tfile_md5:");
+		sb.append(file_md5);
 		return sb.toString();
 		
 	}
