@@ -107,6 +107,56 @@
     <title>Fine Uploader Manual Upload Trigger Demo</title>
 </head>
 <body>
+<div class="panel panel-default" >
+    <!-- Default panel contents -->
+    <div class="panel-heading" id="bg">Panel heading</div>
+
+    <!-- Table -->
+    <table class="table" id="server">
+        <thead>
+        <tr>
+            <th>
+                #
+            </th>
+            <th>
+                NAME
+            </th>
+            <th>
+                IP
+            </th>
+            <th>
+                PORT
+            </th>
+            <th>
+                STATUS
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="success" id="10012">
+            <td>1</td>
+            <td class="name">Server1 </td>
+            <td class="ip">127.0.0.1 </td>
+            <td class="port">10012 </td>
+            <td class="status">Normal</td>
+        </tr>
+        <tr class="success" id="10013">
+            <td>2</td>
+            <td class="name">Server2 </td>
+            <td class="ip">127.0.0.1 </td>
+            <td class="port">10013 </td>
+            <td class="status">Normal</td>
+        </tr>
+        <tr class="success" id="10014">
+            <td>3</td>
+            <td class="name">Server3 </td>
+            <td class="ip">127.0.0.1 </td>
+            <td class="port">10014 </td>
+            <td class="status">Normal</td>
+        </tr>
+        </tbody>
+    </table>
+</div>
 <!-- Fine Uploader DOM Element
 ====================================================================== -->
 <div id="fine-uploader-manual-trigger"></div>
@@ -118,11 +168,15 @@ success: $!success
 <!-- Your code to create an instance of Fine Uploader and bind to the DOM/template
 ====================================================================== -->
 <script>
+    var ip = $("#server").children("tbody").children("tr.success").children("td.ip").text();
+    var port = $("#server").children("tbody").children("tr.success").children("td.port").text();
+    var serverName = $("#server").children("tbody").children("tr.success").children("td.name").text();
     var manualUploader = new qq.FineUploader({
         element: document.getElementById('fine-uploader-manual-trigger'),
         template: 'qq-template-manual-trigger',
         request: {
-            endpoint: '/transferFile/'
+            endpoint: '/transferFile/',
+            params: {ip: ip,port:port}
         },
         thumbnails: {
             placeholders: {
@@ -132,18 +186,44 @@ success: $!success
         },
         callbacks: {
             onComplete: function (id,name,responseJSON) {
-                if(responseJSON.success) {
-                    alert(responseJSON.success);
-                    alert(name);
-                    var id = responseJSON.md5;
 
-                    var h = '<div class="progress"> <div id="" class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%;">0% </div> </div>';
-                    var html = $(h).children().attr("id",id).parent();
-                    //$("#progress").append(id);
-                    $("#progress").append(html);
-                    alert(responseJSON.md5);
+                if(responseJSON.success) {
+                    //alert(responseJSON.success);
+                    //alert(name);
+                    //alert(responseJSON.serverName);
+                    //alert(serverName);
+                    var nameArry =serverName.split(' ');
+                    var id = responseJSON.md5;
+                    $.each(nameArry, function(i) {
+                        if(nameArry[i] == ''){
+                            return true;
+                        }
+                        var serverEleId = '#' + nameArry[i];
+                        var progressEleId = '#progress';
+                        //alert(serverEleId);
+                        if($(serverEleId).length == 0) {
+                            var txt = '<div id=""></div>';
+                            var parent = $(txt).attr("id", nameArry[i]).text(nameArry[i]);
+                            $(progressEleId).append(parent);
+                        }
+                        var file = '<div></div>';
+                        file = $(file).text(responseJSON.fileName);
+                        $(serverEleId).append(file);
+                        var h = '<div class="progress"><div id="" class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%;">0% </div> </div>';
+                        var html = $(h).children().attr("id",id).parent();
+                        $(serverEleId).append(html);
+                        //alert(nameArry[i]);
+                    });
+                    //alert("there");
                     f();
 
+
+
+//                    var h = '<div class="progress"> <div id="" class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%;">0% </div> </div>';
+//                    var html = $(h).children().attr("id",id).parent();
+//                    //$("#progress").append(id);
+//                    $("#progress").append(html);
+                    //alert(responseJSON.md5);
 
                 }
             }
@@ -155,16 +235,20 @@ success: $!success
     qq(document.getElementById("trigger-upload")).attach("click", function() {
         manualUploader.uploadStoredFiles();
     });
+ //   $("#bg").click(function () {
+//        alert("in");
+//        alert($("#server").children("tbody").children("tr.success").children("td.ip").text());
+//        alert($("#server").children("tbody").children("tr.success").children("td.port").text());
+//    });
 
     function f() {
         //按钮单击时执行
         var timer = setInterval(f1, 1000);
-
         function f1() {
             var ajax = $.ajax({
                 type: "POST",
                 url: "/getProgress",
-                //data: {id: id},
+                //data: {ip: ip},
                 dataType: "json",
                 async: true,
                 ache: false,
@@ -176,8 +260,13 @@ success: $!success
                         clearInterval(timer);
                         ajax.abort();
                     }
-                    var ele = "#" + data.id;
-                    var num = $(ele);
+                    var ele = '#' + data.server;
+                    var id = '#' + data.id;
+                    //alert("server"+data.server);
+                    //alert("id" + data.id);
+                    //alert('ele'+ele);
+                    var num = $(ele).children("div.progress").find(id);
+
                     num.text(data.progress + "%");
                     num.attr({
                         "aria-valuenow" : data.progress,

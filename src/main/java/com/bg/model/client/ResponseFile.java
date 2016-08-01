@@ -14,8 +14,8 @@ public class ResponseFile implements Serializable {
 	public ResponseFile(){
 		
 	}
-	
 
+	private String serverName;
 	/**
 	 * 开始 读取点
 	 */
@@ -76,11 +76,21 @@ public class ResponseFile implements Serializable {
 	public void setProgress(int progress) {
 		this.progress = progress;
 	}
-	
+
+	public String getServerName() {
+		return serverName;
+	}
+
+	public void setServerName(String serverName) {
+		this.serverName = serverName;
+	}
+
 	@Override
 	public String toString(){
 		StringBuilder sb = new StringBuilder();
-		sb.append("progress:");
+		sb.append("serverName:");
+		sb.append(serverName);
+		sb.append("\t\tprogress:");
 		sb.append(progress);
 		sb.append("\t\tstart:");
 		sb.append(start);
